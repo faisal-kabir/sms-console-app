@@ -94,7 +94,7 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
               Icon(
                 Icons.sms_failed_outlined,
                 size: 72,
-                color: theme.colorScheme.primary.withOpacity(0.5),
+                color: theme.colorScheme.primary.withValues(alpha: 0.5),
               ),
               const SizedBox(height: AppSpacing.m),
               Text('No Messages Yet', style: theme.textTheme.titleLarge),
@@ -197,20 +197,20 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
 
     switch (status) {
       case 'DELIVERED':
-        bg = AppColors.success.withOpacity(0.12);
+        bg = AppColors.success.withValues(alpha: 0.12);
         fg = AppColors.success;
         break;
       case 'SENT':
-        bg = AppColors.primaryLight.withOpacity(0.12);
+        bg = AppColors.primaryLight.withValues(alpha: 0.12);
         fg = AppColors.primaryLight;
         break;
       case 'ACCEPTED':
-        bg = AppColors.warning.withOpacity(0.12);
+        bg = AppColors.warning.withValues(alpha: 0.12);
         fg = AppColors.warning;
         break;
       case 'FAILED':
       default:
-        bg = AppColors.error.withOpacity(0.12);
+        bg = AppColors.error.withValues(alpha: 0.12);
         fg = AppColors.error;
         break;
     }

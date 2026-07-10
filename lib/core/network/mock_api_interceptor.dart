@@ -216,7 +216,7 @@ class MockApiInterceptor extends Interceptor {
       // Mask recipient phone number (e.g. +4915112345678 -> +4915*****78)
       String masked = to;
       if (to.length > 7) {
-        masked = to.substring(0, 5) + '*****' + to.substring(to.length - 2);
+        masked = '${to.substring(0, 5)}*****${to.substring(to.length - 2)}';
       }
 
       // Add to our mock db

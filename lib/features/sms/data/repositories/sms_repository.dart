@@ -58,6 +58,7 @@ class SmsRepository {
       data: {
         'to': to,
         'body': body,
+        // ignore: use_null_aware_elements
         if (referenceId != null) 'referenceId': referenceId,
       },
       options: ApiClientOptions.postOptions(),
