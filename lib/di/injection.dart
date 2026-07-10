@@ -15,19 +15,23 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<TenantRepository>(() => TenantRepository());
 
   // 3. API Network Client
-  getIt.registerLazySingleton<ApiClient>(() => ApiClient(
-        tenantRepository: getIt<TenantRepository>(),
-        connectivity: getIt<Connectivity>(),
-      ));
+  getIt.registerLazySingleton<ApiClient>(
+    () => ApiClient(
+      tenantRepository: getIt<TenantRepository>(),
+      connectivity: getIt<Connectivity>(),
+    ),
+  );
 
   // 4. Repositories
-  getIt.registerLazySingleton<SmsRepository>(() => SmsRepository(
-        apiClient: getIt<ApiClient>(),
-      ));
+  getIt.registerLazySingleton<SmsRepository>(
+    () => SmsRepository(apiClient: getIt<ApiClient>()),
+  );
 
   // 5. State Management (BLoC)
-  getIt.registerFactory<SmsConsoleBloc>(() => SmsConsoleBloc(
-        smsRepository: getIt<SmsRepository>(),
-        tenantRepository: getIt<TenantRepository>(),
-      ));
+  getIt.registerFactory<SmsConsoleBloc>(
+    () => SmsConsoleBloc(
+      smsRepository: getIt<SmsRepository>(),
+      tenantRepository: getIt<TenantRepository>(),
+    ),
+  );
 }

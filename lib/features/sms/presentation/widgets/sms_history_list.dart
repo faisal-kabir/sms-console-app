@@ -40,7 +40,8 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       if (widget.hasMore && !widget.isLoading) {
         widget.onLoadMore();
       }
@@ -49,7 +50,6 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
 
   @override
   Widget build(BuildContext context) {
-    
     if (widget.messages.isEmpty && !widget.isLoading) {
       return _buildEmptyState(context);
     }
@@ -97,10 +97,7 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
                 color: theme.colorScheme.primary.withOpacity(0.5),
               ),
               const SizedBox(height: AppSpacing.m),
-              Text(
-                'No Messages Yet',
-                style: theme.textTheme.titleLarge,
-              ),
+              Text('No Messages Yet', style: theme.textTheme.titleLarge),
               const SizedBox(height: AppSpacing.s),
               Text(
                 'Sent messages will show up in your console feed.',
@@ -125,10 +122,15 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
 
   Widget _buildMessageCard(BuildContext context, SmsMessage message) {
     final theme = Theme.of(context);
-    final formattedDate = DateFormat('MMM dd, yyyy • HH:mm').format(message.sentAt.toLocal());
+    final formattedDate = DateFormat(
+      'MMM dd, yyyy • HH:mm',
+    ).format(message.sentAt.toLocal());
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: AppSpacing.s, horizontal: AppSpacing.xs),
+      margin: const EdgeInsets.symmetric(
+        vertical: AppSpacing.s,
+        horizontal: AppSpacing.xs,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.m),
         child: Row(
@@ -180,10 +182,7 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  message.cost.currency,
-                  style: theme.textTheme.bodyMedium,
-                ),
+                Text(message.cost.currency, style: theme.textTheme.bodyMedium),
               ],
             ),
           ],
@@ -221,14 +220,13 @@ class _SmsHistoryListState extends State<SmsHistoryList> {
         color: bg,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s,
+        vertical: AppSpacing.xs,
+      ),
       child: Text(
         status,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: fg),
       ),
     );
   }

@@ -5,11 +5,7 @@ class SmsSendForm extends StatefulWidget {
   final bool isSending;
   final Function(String to, String body) onSend;
 
-  const SmsSendForm({
-    super.key,
-    required this.isSending,
-    required this.onSend,
-  });
+  const SmsSendForm({super.key, required this.isSending, required this.onSend});
 
   @override
   State<SmsSendForm> createState() => _SmsSendFormState();
@@ -64,7 +60,11 @@ class _SmsSendFormState extends State<SmsSendForm> {
                 // Relaxed E.164 pattern or custom overrides for tests
                 final cleaned = value.trim();
                 final phoneRegex = RegExp(r'^\+[1-9]\d{1,14}$');
-                if (!phoneRegex.hasMatch(cleaned) && cleaned != '+400' && cleaned != '+429' && cleaned != '+502' && cleaned != '+401') {
+                if (!phoneRegex.hasMatch(cleaned) &&
+                    cleaned != '+400' &&
+                    cleaned != '+429' &&
+                    cleaned != '+502' &&
+                    cleaned != '+401') {
                   return 'Must be valid E.164 format (e.g., +49...)';
                 }
                 return null;

@@ -5,14 +5,15 @@ import 'package:dio/dio.dart';
 class MockApiInterceptor extends Interceptor {
   // Mock database of messages per tenant
   final Map<String, List<Map<String, dynamic>>> _messagesDb = {
-    '9f1c2d3e-4a5b-6c7d-8e9f-0a1b2c3d4e5f': [ // Tenant A
+    '9f1c2d3e-4a5b-6c7d-8e9f-0a1b2c3d4e5f': [
+      // Tenant A
       {
         'messageId': 'SM0001',
         'recipient': '+4915*****11',
         'status': 'DELIVERED',
         'segmentCount': 1,
         'cost': '0.0750',
-        'sentAt': '2026-07-10T10:14:22Z'
+        'sentAt': '2026-07-10T10:14:22Z',
       },
       {
         'messageId': 'SM0002',
@@ -20,7 +21,7 @@ class MockApiInterceptor extends Interceptor {
         'status': 'SENT',
         'segmentCount': 2,
         'cost': '0.1500',
-        'sentAt': '2026-07-10T11:15:30Z'
+        'sentAt': '2026-07-10T11:15:30Z',
       },
       {
         'messageId': 'SM0003',
@@ -28,26 +29,30 @@ class MockApiInterceptor extends Interceptor {
         'status': 'ACCEPTED',
         'segmentCount': 1,
         'cost': '0.0460',
-        'sentAt': '2026-07-10T12:16:45Z'
+        'sentAt': '2026-07-10T12:16:45Z',
       },
     ],
-    '8e2b1c3d-5f4a-7b8c-9d0e-1f2a3b4c5d6e': [ // Tenant B
+    '8e2b1c3d-5f4a-7b8c-9d0e-1f2a3b4c5d6e': [
+      // Tenant B
       {
         'messageId': 'SM0004',
         'recipient': '+1212*****88',
         'status': 'DELIVERED',
         'segmentCount': 3,
         'cost': '0.2250',
-        'sentAt': '2026-07-10T14:20:00Z'
-      }
-    ]
+        'sentAt': '2026-07-10T14:20:00Z',
+      },
+    ],
   };
 
   // Track expired tokens for testing auth refresh flow
   bool _hasRefreshedToken = false;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final path = options.path;
     final tenantId = options.headers['X-Tenant-Id'] as String?;
     final authHeader = options.headers['Authorization'] as String?;
@@ -107,7 +112,10 @@ class MockApiInterceptor extends Interceptor {
           response: Response(
             requestOptions: options,
             statusCode: 401,
-            data: {'errorCode': 'TOKEN_EXPIRED', 'message': 'Access token expired'},
+            data: {
+              'errorCode': 'TOKEN_EXPIRED',
+              'message': 'Access token expired',
+            },
           ),
         ),
       );
@@ -128,7 +136,10 @@ class MockApiInterceptor extends Interceptor {
             response: Response(
               requestOptions: options,
               statusCode: 400,
-              data: {'errorCode': 'INVALID_PHONE_NUMBER', 'message': 'must be E.164'},
+              data: {
+                'errorCode': 'INVALID_PHONE_NUMBER',
+                'message': 'must be E.164',
+              },
             ),
           ),
         );
@@ -142,8 +153,13 @@ class MockApiInterceptor extends Interceptor {
             response: Response(
               requestOptions: options,
               statusCode: 429,
-              headers: Headers.fromMap({'Retry-After': ['5']}),
-              data: {'errorCode': 'RATE_LIMIT_EXCEEDED', 'message': 'Too many requests'},
+              headers: Headers.fromMap({
+                'Retry-After': ['5'],
+              }),
+              data: {
+                'errorCode': 'RATE_LIMIT_EXCEEDED',
+                'message': 'Too many requests',
+              },
             ),
           ),
         );
@@ -157,7 +173,10 @@ class MockApiInterceptor extends Interceptor {
             response: Response(
               requestOptions: options,
               statusCode: 502,
-              data: {'errorCode': 'UPSTREAM_PROVIDER_FAILED', 'message': 'Upstream provider failed'},
+              data: {
+                'errorCode': 'UPSTREAM_PROVIDER_FAILED',
+                'message': 'Upstream provider failed',
+              },
             ),
           ),
         );
@@ -183,7 +202,8 @@ class MockApiInterceptor extends Interceptor {
       final rate = provider == 'TWILIO' ? 0.0750 : 0.0460;
       final cost = (rate * segmentCount).toStringAsFixed(4);
 
-      final messageId = 'SM${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}';
+      final messageId =
+          'SM${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}';
       final responseData = {
         'messageId': messageId,
         'provider': provider,
@@ -213,16 +233,22 @@ class MockApiInterceptor extends Interceptor {
       // Asynchronously update status (only in non-test environments to avoid pending timers)
       if (!Platform.environment.containsKey('FLUTTER_TEST')) {
         Future.delayed(const Duration(seconds: 3), () {
-          if (_messagesDb[tenantId] != null && _messagesDb[tenantId]!.isNotEmpty) {
-            final idx = _messagesDb[tenantId]!.indexWhere((m) => m['messageId'] == messageId);
+          if (_messagesDb[tenantId] != null &&
+              _messagesDb[tenantId]!.isNotEmpty) {
+            final idx = _messagesDb[tenantId]!.indexWhere(
+              (m) => m['messageId'] == messageId,
+            );
             if (idx != -1) {
               _messagesDb[tenantId]![idx]['status'] = 'SENT';
             }
           }
         });
         Future.delayed(const Duration(seconds: 6), () {
-          if (_messagesDb[tenantId] != null && _messagesDb[tenantId]!.isNotEmpty) {
-            final idx = _messagesDb[tenantId]!.indexWhere((m) => m['messageId'] == messageId);
+          if (_messagesDb[tenantId] != null &&
+              _messagesDb[tenantId]!.isNotEmpty) {
+            final idx = _messagesDb[tenantId]!.indexWhere(
+              (m) => m['messageId'] == messageId,
+            );
             if (idx != -1) {
               _messagesDb[tenantId]![idx]['status'] = 'DELIVERED';
             }
@@ -231,18 +257,14 @@ class MockApiInterceptor extends Interceptor {
       }
 
       return handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: 202,
-          data: responseData,
-        ),
+        Response(requestOptions: options, statusCode: 202, data: responseData),
       );
     }
 
     // --- Endpoint: GET /api/v1/sms/cost/breakdown ---
     if (path.endsWith('/api/v1/sms/cost/breakdown')) {
       final messages = _messagesDb[tenantId] ?? [];
-      
+
       double twilioCost = 0.0;
       int twilioCount = 0;
       double awsCost = 0.0;
@@ -250,7 +272,9 @@ class MockApiInterceptor extends Interceptor {
 
       for (final msg in messages) {
         final costDouble = double.parse(msg['cost'] as String);
-        if (msg['recipient'].startsWith('+49') || (msg['recipient'].contains('*****') && messages.indexOf(msg) % 2 == 0)) {
+        if (msg['recipient'].startsWith('+49') ||
+            (msg['recipient'].contains('*****') &&
+                messages.indexOf(msg) % 2 == 0)) {
           twilioCost += costDouble;
           twilioCount++;
         } else {
@@ -268,22 +292,18 @@ class MockApiInterceptor extends Interceptor {
           {
             'provider': 'TWILIO',
             'totalCost': twilioCost.toStringAsFixed(4),
-            'messageCount': twilioCount
+            'messageCount': twilioCount,
           },
           {
             'provider': 'AWS_SNS',
             'totalCost': awsCost.toStringAsFixed(4),
-            'messageCount': awsCount
-          }
-        ]
+            'messageCount': awsCount,
+          },
+        ],
       };
 
       return handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: 200,
-          data: responseData,
-        ),
+        Response(requestOptions: options, statusCode: 200, data: responseData),
       );
     }
 
@@ -292,7 +312,8 @@ class MockApiInterceptor extends Interceptor {
       final messages = _messagesDb[tenantId] ?? [];
       final queryParams = options.queryParameters;
       final cursor = queryParams['cursor'] as String?;
-      final limit = int.tryParse(queryParams['limit']?.toString() ?? '50') ?? 50;
+      final limit =
+          int.tryParse(queryParams['limit']?.toString() ?? '50') ?? 50;
 
       int offset = 0;
       if (cursor != null && cursor.isNotEmpty) {
@@ -309,20 +330,15 @@ class MockApiInterceptor extends Interceptor {
       final hasMore = messages.length > (offset + limit);
       String? nextCursor;
       if (hasMore) {
-        nextCursor = base64.encode(utf8.encode(jsonEncode({'offset': offset + limit})));
+        nextCursor = base64.encode(
+          utf8.encode(jsonEncode({'offset': offset + limit})),
+        );
       }
 
-      final responseData = {
-        'items': paginated,
-        'nextCursor': nextCursor,
-      };
+      final responseData = {'items': paginated, 'nextCursor': nextCursor};
 
       return handler.resolve(
-        Response(
-          requestOptions: options,
-          statusCode: 200,
-          data: responseData,
-        ),
+        Response(requestOptions: options, statusCode: 200, data: responseData),
       );
     }
 

@@ -17,7 +17,8 @@ class CostBreakdownCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final grandTotalStr = costBreakdown?.totalCost.formatWithSymbol() ?? '€0.00';
+    final grandTotalStr =
+        costBreakdown?.totalCost.formatWithSymbol() ?? '€0.00';
 
     return Card(
       child: Padding(
@@ -35,7 +36,9 @@ class CostBreakdownCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(AppSpacing.borderRadius - 4),
+                borderRadius: BorderRadius.circular(
+                  AppSpacing.borderRadius - 4,
+                ),
               ),
               padding: const EdgeInsets.symmetric(
                 vertical: AppSpacing.l,
@@ -62,17 +65,16 @@ class CostBreakdownCard extends StatelessWidget {
                           grandTotalStr,
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontSize: 32,
-                            color: isDark ? AppColors.backgroundDark : Colors.white,
+                            color: isDark
+                                ? AppColors.backgroundDark
+                                : Colors.white,
                           ),
                         ),
                 ],
               ),
             ),
             const SizedBox(height: AppSpacing.m),
-            Text(
-              'Provider Breakdown',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text('Provider Breakdown', style: theme.textTheme.titleMedium),
             const SizedBox(height: AppSpacing.s),
             if (isLoading)
               ...List.generate(
@@ -80,7 +82,9 @@ class CostBreakdownCard extends StatelessWidget {
                 (index) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
                   child: LinearProgressIndicator(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight,
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -95,7 +99,9 @@ class CostBreakdownCard extends StatelessWidget {
                 ),
               )
             else
-              ...costBreakdown!.rows.map((row) => _buildBreakdownRow(context, row)),
+              ...costBreakdown!.rows.map(
+                (row) => _buildBreakdownRow(context, row),
+              ),
           ],
         ),
       ),
@@ -120,7 +126,9 @@ class CostBreakdownCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s),
               Text(
                 row.provider,
-                style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(

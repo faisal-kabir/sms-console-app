@@ -41,7 +41,7 @@ class SmsRepository {
     final itemsList = (data['items'] as List<dynamic>)
         .map((e) => SmsMessage.fromJson(e as Map<String, dynamic>))
         .toList();
-    
+
     return PaginatedMessagesResponse(
       items: itemsList,
       nextCursor: data['nextCursor'] as String?,

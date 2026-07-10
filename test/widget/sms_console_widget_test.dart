@@ -28,24 +28,28 @@ void main() {
   setUp(() async {
     // Disable HTTP runtime fetching of fonts in tests
     GoogleFonts.config.allowRuntimeFetching = false;
-    
+
     // Reset dependency injection between tests
     await getIt.reset();
-    
+
     // Manually register mock and repository classes for full test isolation
     getIt.registerLazySingleton<Connectivity>(() => MockConnectivity());
     getIt.registerLazySingleton<TenantRepository>(() => TenantRepository());
-    getIt.registerLazySingleton<ApiClient>(() => ApiClient(
-          tenantRepository: getIt<TenantRepository>(),
-          connectivity: getIt<Connectivity>(),
-        ));
-    getIt.registerLazySingleton<SmsRepository>(() => SmsRepository(
-          apiClient: getIt<ApiClient>(),
-        ));
-    getIt.registerFactory<SmsConsoleBloc>(() => SmsConsoleBloc(
-          smsRepository: getIt<SmsRepository>(),
-          tenantRepository: getIt<TenantRepository>(),
-        ));
+    getIt.registerLazySingleton<ApiClient>(
+      () => ApiClient(
+        tenantRepository: getIt<TenantRepository>(),
+        connectivity: getIt<Connectivity>(),
+      ),
+    );
+    getIt.registerLazySingleton<SmsRepository>(
+      () => SmsRepository(apiClient: getIt<ApiClient>()),
+    );
+    getIt.registerFactory<SmsConsoleBloc>(
+      () => SmsConsoleBloc(
+        smsRepository: getIt<SmsRepository>(),
+        tenantRepository: getIt<TenantRepository>(),
+      ),
+    );
   });
 
   tearDown(() async {
@@ -53,148 +57,151 @@ void main() {
   });
 
   group('SMS Console Widget & Integration Tests (Catching Findings 4, 6, 8, & 10)', () {
-    testWidgets('Dashboard loads initial state and renders breakdown and feed (Prevents Finding 4: Missing Tenant Isolation)', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const SmsConsolePage(),
-        ),
-      );
+    testWidgets(
+      'Dashboard loads initial state and renders breakdown and feed (Prevents Finding 4: Missing Tenant Isolation)',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(theme: AppTheme.lightTheme, home: const SmsConsolePage()),
+        );
 
-      // Verify the loading spinner is displayed initially (after flushing BLoC microtasks)
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      
-      // Let async timer in MockApiInterceptor finish loading (600ms)
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
+        // Verify the loading spinner is displayed initially (after flushing BLoC microtasks)
+        await tester.pump();
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Renders header, cards, and list
-      expect(find.text('SMS Gateway Console'), findsOneWidget);
-      expect(find.text('TOTAL SMS COST'), findsOneWidget);
-      expect(find.text('Acme Corp (Tenant A)'), findsOneWidget);
-      
-      // Asserts that the history list loaded mock data (SM0001, SM0002, SM0003)
-      expect(find.text('+4915*****11'), findsOneWidget);
-      expect(find.text('+4915*****22'), findsOneWidget);
-      expect(find.text('+4915*****33'), findsOneWidget);
+        // Let async timer in MockApiInterceptor finish loading (600ms)
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
 
-      // Verify no spinners or loading indicators left
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-    });
+        // Renders header, cards, and list
+        expect(find.text('SMS Gateway Console'), findsOneWidget);
+        expect(find.text('TOTAL SMS COST'), findsOneWidget);
+        expect(find.text('Acme Corp (Tenant A)'), findsOneWidget);
 
-    testWidgets('Tenant isolation works: switching tenants updates header, cost breakdown, and clears old list (Prevents Finding 8: Cross-tenant leak)', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const SmsConsolePage(),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
+        // Asserts that the history list loaded mock data (SM0001, SM0002, SM0003)
+        expect(find.text('+4915*****11'), findsOneWidget);
+        expect(find.text('+4915*****22'), findsOneWidget);
+        expect(find.text('+4915*****33'), findsOneWidget);
 
-      // Starts with Tenant A details
-      expect(find.text('+4915*****11'), findsOneWidget); // Tenant A item
-      expect(find.text('+1212*****88'), findsNothing);    // Tenant B item
+        // Verify no spinners or loading indicators left
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+      },
+    );
 
-      // Tap on tenant selector dropdown
-      final dropdown = find.byType(DropdownButton<String>);
-      expect(dropdown, findsOneWidget);
-      await tester.tap(dropdown);
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Tenant isolation works: switching tenants updates header, cost breakdown, and clears old list (Prevents Finding 8: Cross-tenant leak)',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(theme: AppTheme.lightTheme, home: const SmsConsolePage()),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
 
-      // Tap Tenant B option
-      final tenantBOption = find.text('Stark Labs (Tenant B)').last;
-      await tester.tap(tenantBOption);
-      
-      // Pump initial loader
-      await tester.pump();
-      
-      // Wait for Mock API response
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
+        // Starts with Tenant A details
+        expect(find.text('+4915*****11'), findsOneWidget); // Tenant A item
+        expect(find.text('+1212*****88'), findsNothing); // Tenant B item
 
-      // Verifies Tenant B items loaded, and Tenant A items cleared (No cross-tenant leak!)
-      expect(find.text('+1212*****88'), findsOneWidget); // Tenant B item
-      expect(find.text('+4915*****11'), findsNothing);    // Tenant A item
-    });
+        // Tap on tenant selector dropdown
+        final dropdown = find.byType(DropdownButton<String>);
+        expect(dropdown, findsOneWidget);
+        await tester.tap(dropdown);
+        await tester.pumpAndSettle();
 
-    testWidgets('SMS Send Flow Success: displays success snackbar, updates breakdown rows, and reloads history list (Prevents Finding 10: Inconsistent Cost Estimation)', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const SmsConsolePage(),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
+        // Tap Tenant B option
+        final tenantBOption = find.text('Stark Labs (Tenant B)').last;
+        await tester.tap(tenantBOption);
 
-      // Find TextFormField by type and index
-      final phoneField = find.byType(TextFormField).at(0);
-      final messageField = find.byType(TextFormField).at(1);
-      final sendButton = find.byType(ElevatedButton);
+        // Pump initial loader
+        await tester.pump();
 
-      await tester.enterText(phoneField, '+49159999999');
-      await tester.enterText(messageField, 'Test message content');
-      await tester.pumpAndSettle();
+        // Wait for Mock API response
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
 
-      // Tap send
-      await tester.tap(sendButton);
-      // Pump initial loading state
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsOneWidget); // Button shows loading spinner
+        // Verifies Tenant B items loaded, and Tenant A items cleared (No cross-tenant leak!)
+        expect(find.text('+1212*****88'), findsOneWidget); // Tenant B item
+        expect(find.text('+4915*****11'), findsNothing); // Tenant A item
+      },
+    );
 
-      // Wait for Mock API response
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+    testWidgets(
+      'SMS Send Flow Success: displays success snackbar, updates breakdown rows, and reloads history list (Prevents Finding 10: Inconsistent Cost Estimation)',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(theme: AppTheme.lightTheme, home: const SmsConsolePage()),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
 
-      // Assert snackbar shows up with exact provider name and cost
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('Sent via TWILIO — €0.07'), findsOneWidget);
+        // Find TextFormField by type and index
+        final phoneField = find.byType(TextFormField).at(0);
+        final messageField = find.byType(TextFormField).at(1);
+        final sendButton = find.byType(ElevatedButton);
 
-      // Verify message has been added to list feed
-      expect(find.text('+4915*****99'), findsOneWidget);
-    });
+        await tester.enterText(phoneField, '+49159999999');
+        await tester.enterText(messageField, 'Test message content');
+        await tester.pumpAndSettle();
 
-    testWidgets('SMS Send Flow Failure: handles validation error, shows snackbar, and does not hang on loading spinner (Prevents Finding 6: Infinite spinner on errors)', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const SmsConsolePage(),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
+        // Tap send
+        await tester.tap(sendButton);
+        // Pump initial loading state
+        await tester.pump();
+        expect(
+          find.byType(CircularProgressIndicator),
+          findsOneWidget,
+        ); // Button shows loading spinner
 
-      final phoneField = find.byType(TextFormField).at(0);
-      final messageField = find.byType(TextFormField).at(1);
-      final sendButton = find.byType(ElevatedButton);
+        // Wait for Mock API response
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
-      // input number '+400' to trigger validation error mock scenario
-      await tester.enterText(phoneField, '+400');
-      await tester.enterText(messageField, 'Message body');
-      await tester.pumpAndSettle();
+        // Assert snackbar shows up with exact provider name and cost
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(find.text('Sent via TWILIO — €0.07'), findsOneWidget);
 
-      await tester.tap(sendButton);
-      await tester.pump();
-      
-      // Let Mock API respond with error
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+        // Verify message has been added to list feed
+        expect(find.text('+4915*****99'), findsOneWidget);
+      },
+    );
 
-      // Verifies snackbar error toast appears
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('Validation Error: must be E.164'), findsOneWidget);
+    testWidgets(
+      'SMS Send Flow Failure: handles validation error, shows snackbar, and does not hang on loading spinner (Prevents Finding 6: Infinite spinner on errors)',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(theme: AppTheme.lightTheme, home: const SmsConsolePage()),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
 
-      // Verify that the send form is interactable and does not hang on progress spinner
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.text('Send Message'), findsOneWidget);
-    });
+        final phoneField = find.byType(TextFormField).at(0);
+        final messageField = find.byType(TextFormField).at(1);
+        final sendButton = find.byType(ElevatedButton);
+
+        // input number '+400' to trigger validation error mock scenario
+        await tester.enterText(phoneField, '+400');
+        await tester.enterText(messageField, 'Message body');
+        await tester.pumpAndSettle();
+
+        await tester.tap(sendButton);
+        await tester.pump();
+
+        // Let Mock API respond with error
+        await tester.pump(const Duration(milliseconds: 1000));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        // Verifies snackbar error toast appears
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(find.text('Validation Error: must be E.164'), findsOneWidget);
+
+        // Verify that the send form is interactable and does not hang on progress spinner
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.text('Send Message'), findsOneWidget);
+      },
+    );
   });
 }

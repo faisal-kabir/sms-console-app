@@ -31,7 +31,7 @@ class AuthRefreshInterceptor extends Interceptor {
 
           // Retry the original request with the new token
           requestOptions.headers['Authorization'] = 'Bearer $newToken';
-          
+
           // Fetch expects a clean requestOptions
           final response = await dio.fetch(requestOptions);
           return handler.resolve(response);

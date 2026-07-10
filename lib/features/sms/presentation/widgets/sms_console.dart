@@ -64,7 +64,10 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
               SnackBar(
                 content: Text(
                   state.successMessage!,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 backgroundColor: AppColors.success,
                 behavior: SnackBarBehavior.floating,
@@ -77,7 +80,10 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
               SnackBar(
                 content: Text(
                   state.error!,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
@@ -95,26 +101,36 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
           appBar: AppBar(
             title: Text(
               'SMS Gateway Console',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
             actions: [
               // Tenant Selector Dropdown
               BlocBuilder<SmsConsoleBloc, SmsConsoleState>(
                 builder: (context, state) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.s,
+                    ),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                      color: isDark
+                          ? AppColors.surfaceDark
+                          : AppColors.surfaceLight,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                        color: isDark
+                            ? AppColors.borderDark
+                            : AppColors.borderLight,
                       ),
                     ),
                     height: 38,
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: state.tenantId,
-                        dropdownColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                        dropdownColor: isDark
+                            ? AppColors.surfaceDark
+                            : AppColors.surfaceLight,
                         icon: const Icon(Icons.arrow_drop_down, size: 20),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
@@ -141,7 +157,9 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
               if (widget.onToggleTheme != null)
                 IconButton(
                   onPressed: widget.onToggleTheme,
-                  icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+                  icon: Icon(
+                    widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  ),
                   tooltip: 'Toggle Light/Dark Theme',
                 ),
               const SizedBox(width: AppSpacing.s),
@@ -149,12 +167,17 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
           ),
           body: BlocBuilder<SmsConsoleBloc, SmsConsoleState>(
             builder: (context, state) {
-              if (state.status == SmsConsoleStatus.loading && state.costBreakdown == null) {
+              if (state.status == SmsConsoleStatus.loading &&
+                  state.costBreakdown == null) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (state.status == SmsConsoleStatus.error && state.costBreakdown == null) {
-                return _buildErrorView(context, state.error ?? 'Unknown loading error');
+              if (state.status == SmsConsoleStatus.error &&
+                  state.costBreakdown == null) {
+                return _buildErrorView(
+                  context,
+                  state.error ?? 'Unknown loading error',
+                );
               }
 
               return LayoutBuilder(
@@ -297,7 +320,10 @@ class _SmsConsolePageState extends State<SmsConsolePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.s),
+                  padding: const EdgeInsets.only(
+                    left: AppSpacing.xs,
+                    bottom: AppSpacing.s,
+                  ),
                   child: Text(
                     'SMS Message History Feed',
                     style: theme.textTheme.titleMedium?.copyWith(fontSize: 18),

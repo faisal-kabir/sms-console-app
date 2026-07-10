@@ -11,7 +11,7 @@ class AppSpacing {
   static const double l = 24.0;
   static const double xl = 32.0;
   static const double xxl = 48.0;
-  
+
   static const double tapTargetMin = 48.0;
   static const double borderRadius = 16.0;
   static const double buttonHeight = 52.0;
@@ -57,10 +57,24 @@ class AppTheme {
       ),
       textTheme: _isTest
           ? ThemeData.light().textTheme.copyWith(
-              titleLarge: const TextStyle(color: AppColors.textPrimaryLight, fontWeight: FontWeight.bold, fontSize: 22),
-              titleMedium: const TextStyle(color: AppColors.textPrimaryLight, fontWeight: FontWeight.w600, fontSize: 16),
-              bodyLarge: const TextStyle(color: AppColors.textPrimaryLight, fontSize: 15),
-              bodyMedium: const TextStyle(color: AppColors.textSecondaryLight, fontSize: 13),
+              titleLarge: const TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+              titleMedium: const TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              bodyLarge: const TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: 15,
+              ),
+              bodyMedium: const TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: 13,
+              ),
             )
           : GoogleFonts.outfitTextTheme(ThemeData.light().textTheme).copyWith(
               titleLarge: GoogleFonts.outfit(
@@ -127,10 +141,7 @@ class AppTheme {
           ),
           textStyle: _isTest
               ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
-              : GoogleFonts.outfit(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              : GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
@@ -150,10 +161,24 @@ class AppTheme {
       ),
       textTheme: _isTest
           ? ThemeData.dark().textTheme.copyWith(
-              titleLarge: const TextStyle(color: AppColors.textPrimaryDark, fontWeight: FontWeight.bold, fontSize: 22),
-              titleMedium: const TextStyle(color: AppColors.textPrimaryDark, fontWeight: FontWeight.w600, fontSize: 16),
-              bodyLarge: const TextStyle(color: AppColors.textPrimaryDark, fontSize: 15),
-              bodyMedium: const TextStyle(color: AppColors.textSecondaryDark, fontSize: 13),
+              titleLarge: const TextStyle(
+                color: AppColors.textPrimaryDark,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+              titleMedium: const TextStyle(
+                color: AppColors.textPrimaryDark,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              bodyLarge: const TextStyle(
+                color: AppColors.textPrimaryDark,
+                fontSize: 15,
+              ),
+              bodyMedium: const TextStyle(
+                color: AppColors.textSecondaryDark,
+                fontSize: 13,
+              ),
             )
           : GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
               titleLarge: GoogleFonts.outfit(
@@ -220,10 +245,7 @@ class AppTheme {
           ),
           textStyle: _isTest
               ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
-              : GoogleFonts.outfit(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              : GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );

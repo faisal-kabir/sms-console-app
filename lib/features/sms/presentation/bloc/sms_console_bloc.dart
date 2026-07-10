@@ -10,10 +10,8 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
   final SmsRepository smsRepository;
   final TenantRepository tenantRepository;
 
-  SmsConsoleBloc({
-    required this.smsRepository,
-    required this.tenantRepository,
-  }) : super(SmsConsoleState.initial(tenantRepository.tenantId)) {
+  SmsConsoleBloc({required this.smsRepository, required this.tenantRepository})
+    : super(SmsConsoleState.initial(tenantRepository.tenantId)) {
     on<FetchDashboard>(_onFetchDashboard);
     on<ChangeTenant>(_onChangeTenant);
     on<LoadMoreMessages>(_onLoadMoreMessages);
@@ -31,17 +29,18 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
       final breakdown = await smsRepository.getCostBreakdown();
       final messagesRes = await smsRepository.getMessages(limit: 50);
 
-      emit(state.copyWith(
-        status: SmsConsoleStatus.success,
-        costBreakdown: breakdown,
-        messages: messagesRes.items,
-        nextCursor: messagesRes.nextCursor,
-      ));
+      emit(
+        state.copyWith(
+          status: SmsConsoleStatus.success,
+          costBreakdown: breakdown,
+          messages: messagesRes.items,
+          nextCursor: messagesRes.nextCursor,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: SmsConsoleStatus.error,
-        error: _parseError(e),
-      ));
+      emit(
+        state.copyWith(status: SmsConsoleStatus.error, error: _parseError(e)),
+      );
     }
   }
 
@@ -50,12 +49,14 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
     Emitter<SmsConsoleState> emit,
   ) async {
     tenantRepository.setTenantId(event.newTenantId);
-    
+
     // Clear old state completely for tenant isolation
-    emit(SmsConsoleState.initial(event.newTenantId).copyWith(
-      status: SmsConsoleStatus.loading,
-    ));
-    
+    emit(
+      SmsConsoleState.initial(
+        event.newTenantId,
+      ).copyWith(status: SmsConsoleStatus.loading),
+    );
+
     // Trigger fresh dashboard load
     add(const FetchDashboard());
   }
@@ -74,21 +75,22 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
         limit: 50,
       );
 
-      emit(state.copyWith(
-        messages: [...state.messages, ...messagesRes.items],
-        nextCursor: messagesRes.nextCursor,
-      ));
+      emit(
+        state.copyWith(
+          messages: [...state.messages, ...messagesRes.items],
+          nextCursor: messagesRes.nextCursor,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        error: 'Failed to load more messages: ${_parseError(e)}',
-      ));
+      emit(
+        state.copyWith(
+          error: 'Failed to load more messages: ${_parseError(e)}',
+        ),
+      );
     }
   }
 
-  Future<void> _onSendSms(
-    SendSms event,
-    Emitter<SmsConsoleState> emit,
-  ) async {
+  Future<void> _onSendSms(SendSms event, Emitter<SmsConsoleState> emit) async {
     emit(state.copyWith(isSending: true));
     try {
       final sendRes = await smsRepository.sendSms(
@@ -102,13 +104,16 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
 
       final costMoney = Money.parse(sendRes.cost, currency: sendRes.currency);
 
-      emit(state.copyWith(
-        isSending: false,
-        costBreakdown: breakdown,
-        messages: messagesRes.items,
-        nextCursor: messagesRes.nextCursor,
-        successMessage: 'Sent via ${sendRes.provider} — €${costMoney.format()}',
-      ));
+      emit(
+        state.copyWith(
+          isSending: false,
+          costBreakdown: breakdown,
+          messages: messagesRes.items,
+          nextCursor: messagesRes.nextCursor,
+          successMessage:
+              'Sent via ${sendRes.provider} — €${costMoney.format()}',
+        ),
+      );
     } on DioException catch (e) {
       int retrySecs = 0;
       bool rateLimited = false;
@@ -119,26 +124,23 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
         retrySecs = int.tryParse(retryHeader ?? '') ?? 0;
       }
 
-      emit(state.copyWith(
-        isSending: false,
-        error: _parseError(e),
-        isRateLimited: rateLimited,
-        retryAfterSeconds: retrySecs,
-      ));
+      emit(
+        state.copyWith(
+          isSending: false,
+          error: _parseError(e),
+          isRateLimited: rateLimited,
+          retryAfterSeconds: retrySecs,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isSending: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isSending: false, error: e.toString()));
     }
   }
 
   void _onClearError(ClearError event, Emitter<SmsConsoleState> emit) {
-    emit(state.copyWith(
-      error: null,
-      isRateLimited: false,
-      retryAfterSeconds: 0,
-    ));
+    emit(
+      state.copyWith(error: null, isRateLimited: false, retryAfterSeconds: 0),
+    );
   }
 
   void _onClearSuccess(ClearSuccess event, Emitter<SmsConsoleState> emit) {

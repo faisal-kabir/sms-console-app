@@ -41,7 +41,14 @@ class SmsMessage extends Equatable {
   }
 
   @override
-  List<Object?> get props => [messageId, recipient, status, segmentCount, cost, sentAt];
+  List<Object?> get props => [
+    messageId,
+    recipient,
+    status,
+    segmentCount,
+    cost,
+    sentAt,
+  ];
 }
 
 class CostBreakdownRow extends Equatable {
@@ -79,17 +86,14 @@ class CostBreakdown extends Equatable {
   final Money totalCost;
   final List<CostBreakdownRow> rows;
 
-  const CostBreakdown({
-    required this.totalCost,
-    required this.rows,
-  });
+  const CostBreakdown({required this.totalCost, required this.rows});
 
   factory CostBreakdown.fromJson(Map<String, dynamic> json) {
     final currency = json['currency'] as String? ?? 'EUR';
     final rowsList = (json['rows'] as List<dynamic>)
         .map((e) => CostBreakdownRow.fromJson(e as Map<String, dynamic>))
         .toList();
-    
+
     return CostBreakdown(
       totalCost: Money.parse(json['totalCost'] as String, currency: currency),
       rows: rowsList,

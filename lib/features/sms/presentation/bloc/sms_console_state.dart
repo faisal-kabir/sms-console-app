@@ -12,7 +12,7 @@ class SmsConsoleState extends Equatable {
   final String? nextCursor;
   final String? error;
   final String? successMessage;
-  
+
   final bool isRateLimited;
   final int retryAfterSeconds;
 
@@ -66,15 +66,15 @@ class SmsConsoleState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        isSending,
-        tenantId,
-        costBreakdown,
-        messages,
-        nextCursor,
-        error,
-        successMessage,
-        isRateLimited,
-        retryAfterSeconds,
-      ];
+    status,
+    isSending,
+    tenantId,
+    costBreakdown,
+    messages,
+    nextCursor,
+    error,
+    successMessage,
+    isRateLimited,
+    retryAfterSeconds,
+  ];
 }

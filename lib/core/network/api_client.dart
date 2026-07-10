@@ -12,16 +12,14 @@ class ApiClient {
   final TenantRepository tenantRepository;
   final Connectivity connectivity;
 
-  ApiClient({
-    required this.tenantRepository,
-    required this.connectivity,
-  }) : dio = Dio(
-          BaseOptions(
-            baseUrl: AppConfig.apiBaseUrl,
-            connectTimeout: const Duration(seconds: 5),
-            receiveTimeout: const Duration(seconds: 5),
-          ),
-        ) {
+  ApiClient({required this.tenantRepository, required this.connectivity})
+    : dio = Dio(
+        BaseOptions(
+          baseUrl: AppConfig.apiBaseUrl,
+          connectTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+        ),
+      ) {
     dio.interceptors.clear();
 
     // 1. Add logger interceptor in debug mode

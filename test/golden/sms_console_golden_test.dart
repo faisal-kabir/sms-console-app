@@ -20,25 +20,25 @@ void main() {
     await getIt.reset();
   });
 
-  testWidgets('SMS Console Page Golden Test (Prevents Finding 7: Layout regression)', (tester) async {
-    tester.view.physicalSize = const Size(1400, 900);
-    tester.view.devicePixelRatio = 1.0;
+  testWidgets(
+    'SMS Console Page Golden Test (Prevents Finding 7: Layout regression)',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.darkTheme,
-        home: const SmsConsolePage(),
-      ),
-    );
+      await tester.pumpWidget(
+        MaterialApp(theme: AppTheme.darkTheme, home: const SmsConsolePage()),
+      );
 
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 1000));
-    await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1000));
+      await tester.pump();
 
-    // Check matches golden file
-    await expectLater(
-      find.byType(SmsConsolePage),
-      matchesGoldenFile('goldens/sms_console_dark.png'),
-    );
-  });
+      // Check matches golden file
+      await expectLater(
+        find.byType(SmsConsolePage),
+        matchesGoldenFile('goldens/sms_console_dark.png'),
+      );
+    },
+  );
 }

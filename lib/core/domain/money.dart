@@ -16,20 +16,23 @@ class Money extends Equatable {
     if (parts.isEmpty) {
       throw FormatException('Invalid amount format: $amountStr');
     }
-    
+
     int whole = int.parse(parts[0]);
     int fractional = 0;
-    
+
     if (parts.length > 1) {
       String fracStr = parts[1];
       if (fracStr.length > 4) {
         fracStr = fracStr.substring(0, 4); // Limit to 4 decimal places
       } else {
-        fracStr = fracStr.padRight(4, '0'); // Pad with zeros to 4 decimal places
+        fracStr = fracStr.padRight(
+          4,
+          '0',
+        ); // Pad with zeros to 4 decimal places
       }
       fractional = int.parse(fracStr);
     }
-    
+
     final micro = (whole * 10000) + fractional;
     return Money(micro, currency: currency);
   }
@@ -40,7 +43,9 @@ class Money extends Equatable {
 
   Money operator +(Money other) {
     if (currency != other.currency) {
-      throw ArgumentError('Cannot add different currencies: $currency and ${other.currency}');
+      throw ArgumentError(
+        'Cannot add different currencies: $currency and ${other.currency}',
+      );
     }
     return Money(microAmount + other.microAmount, currency: currency);
   }
