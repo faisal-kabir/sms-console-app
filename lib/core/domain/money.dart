@@ -56,12 +56,6 @@ class Money extends Equatable {
 
   double toDouble() => microAmount / 10000.0;
 
-  @override
-  String toString() {
-    final doubleVal = toDouble();
-    return doubleVal.toStringAsFixed(4);
-  }
-
   // Visual string format (e.g. 2 decimal places)
   String format() {
     final doubleVal = toDouble();

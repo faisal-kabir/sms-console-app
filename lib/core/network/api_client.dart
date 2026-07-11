@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sms_console_app/core/network/mock_api_interceptor.dart';
 import '../config/app_config.dart';
 import '../../features/sms/data/repositories/tenant_repository.dart';
 import 'tenant_interceptor.dart';
@@ -28,6 +29,7 @@ class ApiClient {
 
     // 2. Add Tenant Injector Interceptor
     dio.interceptors.add(TenantInterceptor(tenantRepository));
+    dio.interceptors.add(MockApiInterceptor());
 
     // 3. Add Auth Token Refresh Interceptor
     dio.interceptors.add(AuthRefreshInterceptor(tenantRepository, dio));
