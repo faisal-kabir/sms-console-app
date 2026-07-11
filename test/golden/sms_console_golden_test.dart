@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sms_console_app/di/injection.dart';
 import 'package:sms_console_app/features/sms/presentation/widgets/sms_console.dart';
 import 'package:sms_console_app/core/theme/app_theme.dart';
@@ -11,8 +10,6 @@ void main() {
   final getIt = GetIt.instance;
 
   setUp(() async {
-    // Disable HTTP runtime fetching of fonts in tests
-    GoogleFonts.config.allowRuntimeFetching = false;
     await getIt.reset();
     await initDependencies();
   });

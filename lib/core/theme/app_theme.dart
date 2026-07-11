@@ -1,8 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-final bool _isTest = Platform.environment.containsKey('FLUTTER_TEST');
 
 class AppSpacing {
   static const double xs = 4.0;
@@ -55,47 +51,26 @@ class AppTheme {
         surface: AppColors.surfaceLight,
         error: AppColors.error,
       ),
-      textTheme: _isTest
-          ? ThemeData.light().textTheme.copyWith(
-              titleLarge: const TextStyle(
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-              titleMedium: const TextStyle(
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-              bodyLarge: const TextStyle(
-                color: AppColors.textPrimaryLight,
-                fontSize: 15,
-              ),
-              bodyMedium: const TextStyle(
-                color: AppColors.textSecondaryLight,
-                fontSize: 13,
-              ),
-            )
-          : GoogleFonts.outfitTextTheme(ThemeData.light().textTheme).copyWith(
-              titleLarge: GoogleFonts.outfit(
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-              titleMedium: GoogleFonts.outfit(
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-              bodyLarge: GoogleFonts.outfit(
-                color: AppColors.textPrimaryLight,
-                fontSize: 15,
-              ),
-              bodyMedium: GoogleFonts.outfit(
-                color: AppColors.textSecondaryLight,
-                fontSize: 13,
-              ),
+      textTheme: ThemeData.light().textTheme.copyWith(
+            titleLarge: const TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
+            titleMedium: const TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+            bodyLarge: const TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontSize: 15,
+            ),
+            bodyMedium: const TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: 13,
+            ),
+          ),
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 0,
@@ -127,9 +102,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.borderRadius),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        labelStyle: _isTest
-            ? const TextStyle(color: AppColors.textSecondaryLight)
-            : GoogleFonts.outfit(color: AppColors.textSecondaryLight),
+        labelStyle: const TextStyle(color: AppColors.textSecondaryLight),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -139,9 +112,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadius),
           ),
-          textStyle: _isTest
-              ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
-              : GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
@@ -159,47 +130,26 @@ class AppTheme {
         surface: AppColors.surfaceDark,
         error: AppColors.error,
       ),
-      textTheme: _isTest
-          ? ThemeData.dark().textTheme.copyWith(
-              titleLarge: const TextStyle(
-                color: AppColors.textPrimaryDark,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-              titleMedium: const TextStyle(
-                color: AppColors.textPrimaryDark,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-              bodyLarge: const TextStyle(
-                color: AppColors.textPrimaryDark,
-                fontSize: 15,
-              ),
-              bodyMedium: const TextStyle(
-                color: AppColors.textSecondaryDark,
-                fontSize: 13,
-              ),
-            )
-          : GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
-              titleLarge: GoogleFonts.outfit(
-                color: AppColors.textPrimaryDark,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-              titleMedium: GoogleFonts.outfit(
-                color: AppColors.textPrimaryDark,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-              bodyLarge: GoogleFonts.outfit(
-                color: AppColors.textPrimaryDark,
-                fontSize: 15,
-              ),
-              bodyMedium: GoogleFonts.outfit(
-                color: AppColors.textSecondaryDark,
-                fontSize: 13,
-              ),
+      textTheme: ThemeData.dark().textTheme.copyWith(
+            titleLarge: const TextStyle(
+              color: AppColors.textPrimaryDark,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
+            titleMedium: const TextStyle(
+              color: AppColors.textPrimaryDark,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+            bodyLarge: const TextStyle(
+              color: AppColors.textPrimaryDark,
+              fontSize: 15,
+            ),
+            bodyMedium: const TextStyle(
+              color: AppColors.textSecondaryDark,
+              fontSize: 13,
+            ),
+          ),
       cardTheme: CardThemeData(
         color: AppColors.surfaceDark,
         elevation: 0,
@@ -231,9 +181,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.borderRadius),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        labelStyle: _isTest
-            ? const TextStyle(color: AppColors.textSecondaryDark)
-            : GoogleFonts.outfit(color: AppColors.textSecondaryDark),
+        labelStyle: const TextStyle(color: AppColors.textSecondaryDark),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -243,9 +191,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadius),
           ),
-          textStyle: _isTest
-              ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
-              : GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
