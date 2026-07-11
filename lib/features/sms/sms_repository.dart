@@ -63,7 +63,8 @@ class SmsRepository {
       int awsCount = 0;
 
       for (final msg in localMsgs) {
-        final isTwilio = msg.recipient.startsWith('+49') ||
+        final isTwilio =
+            msg.recipient.startsWith('+49') ||
             msg.recipient.startsWith('+401') ||
             msg.recipient.startsWith('+429');
         if (isTwilio) {
@@ -196,7 +197,8 @@ class SmsRepository {
         );
       }
 
-      final provider = (to.startsWith('+49') ||
+      final provider =
+          (to.startsWith('+49') ||
               to.startsWith('+401') ||
               to.startsWith('+429'))
           ? 'TWILIO'

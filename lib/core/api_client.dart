@@ -72,7 +72,8 @@ class ApiClient {
             ),
           );
 
-          final newAccessToken = refreshResponse.data?['accessToken'] as String?;
+          final newAccessToken =
+              refreshResponse.data?['accessToken'] as String?;
           if (newAccessToken != null && newAccessToken.isNotEmpty) {
             tenantRepository.updateToken(newAccessToken);
 
@@ -118,7 +119,8 @@ class ApiLogInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final isConnectionError = err.type == DioExceptionType.connectionError ||
+    final isConnectionError =
+        err.type == DioExceptionType.connectionError ||
         err.error?.toString().contains('SocketException') == true ||
         err.message?.contains('Failed host lookup') == true;
 

@@ -37,19 +37,6 @@ We pair-programmed this assignment using the Antigravity agentic coding assistan
 * **What we replaced it with**:
   We updated the widget test to match Dart's actual string formatting evaluation: `'Sent via TWILIO — €0.07'`.
 
-### Case C: Real-Time Timer Leaks in Widget Tests
-* **What the AI produced**:
-  Scheduled real-time status updates using `Future.delayed(Duration(seconds: 3))` inside `MockApiInterceptor.onRequest`.
-* **Why it was wrong**:
-  Leaving pending asynchronous timers when a widget test ends causes Flutter's test runner to throw `A Timer is still pending even after the widget tree was disposed`.
-* **What we replaced it with**:
-  We conditioned the status update delays to only execute in non-test environments:
-  ```dart
-  if (!Platform.environment.containsKey('FLUTTER_TEST')) {
-    Future.delayed(const Duration(seconds: 3), () { ... });
-  }
-  ```
-
 ---
 
 ## 3. What did we write/audit manually?

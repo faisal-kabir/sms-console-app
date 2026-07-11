@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:sms_console_app/features/sms/sms_console_page.dart';
 import 'package:sms_console_app/core/app_theme.dart';
 import 'package:sms_console_app/core/api_client.dart';
-import '../mocks/mock_api_interceptor.dart';
+import '../mocks/mock_sms_repository.dart';
 import 'package:sms_console_app/features/sms/sms_repository.dart';
 import 'package:sms_console_app/features/sms/sms_bloc.dart';
 
@@ -35,10 +35,10 @@ void main() {
       () => ApiClient(
         tenantRepository: getIt<TenantRepository>(),
         connectivity: getIt<Connectivity>(),
-      )..dio.interceptors.add(MockApiInterceptor()),
+      ),
     );
     getIt.registerLazySingleton<SmsRepository>(
-      () => SmsRepository(apiClient: getIt<ApiClient>()),
+      () => MockSmsRepository(getIt<ApiClient>()),
     );
     getIt.registerFactory<SmsConsoleBloc>(
       () => SmsConsoleBloc(
@@ -64,7 +64,7 @@ void main() {
         await tester.pump();
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-        // Let async timer in MockApiInterceptor finish loading (600ms)
+        // Let the mock repository delay finish loading
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 1000));
         await tester.pump();

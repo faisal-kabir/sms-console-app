@@ -6,7 +6,8 @@ import 'package:sms_console_app/di/injection.dart';
 import 'package:sms_console_app/features/sms/sms_console_page.dart';
 import 'package:sms_console_app/core/app_theme.dart';
 import 'package:sms_console_app/core/api_client.dart';
-import '../mocks/mock_api_interceptor.dart';
+import '../mocks/mock_sms_repository.dart';
+import 'package:sms_console_app/features/sms/sms_repository.dart';
 
 void main() {
   final getIt = GetIt.instance;
@@ -14,7 +15,12 @@ void main() {
   setUp(() async {
     await getIt.reset();
     await initDependencies();
-    getIt<ApiClient>().dio.interceptors.add(MockApiInterceptor());
+
+    // Unregister original repository and register MockSmsRepository
+    getIt.unregister<SmsRepository>();
+    getIt.registerLazySingleton<SmsRepository>(
+      () => MockSmsRepository(getIt<ApiClient>()),
+    );
   });
 
   tearDown(() async {

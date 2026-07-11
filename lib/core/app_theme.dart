@@ -52,25 +52,25 @@ class AppTheme {
         error: AppColors.error,
       ),
       textTheme: ThemeData.light().textTheme.copyWith(
-            titleLarge: const TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
-            titleMedium: const TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
-            bodyLarge: const TextStyle(
-              color: AppColors.textPrimaryLight,
-              fontSize: 15,
-            ),
-            bodyMedium: const TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: 13,
-            ),
-          ),
+        titleLarge: const TextStyle(
+          color: AppColors.textPrimaryLight,
+          fontWeight: FontWeight.bold,
+          fontSize: 22,
+        ),
+        titleMedium: const TextStyle(
+          color: AppColors.textPrimaryLight,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        bodyLarge: const TextStyle(
+          color: AppColors.textPrimaryLight,
+          fontSize: 15,
+        ),
+        bodyMedium: const TextStyle(
+          color: AppColors.textSecondaryLight,
+          fontSize: 13,
+        ),
+      ),
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 0,
@@ -131,25 +131,25 @@ class AppTheme {
         error: AppColors.error,
       ),
       textTheme: ThemeData.dark().textTheme.copyWith(
-            titleLarge: const TextStyle(
-              color: AppColors.textPrimaryDark,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
-            titleMedium: const TextStyle(
-              color: AppColors.textPrimaryDark,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
-            bodyLarge: const TextStyle(
-              color: AppColors.textPrimaryDark,
-              fontSize: 15,
-            ),
-            bodyMedium: const TextStyle(
-              color: AppColors.textSecondaryDark,
-              fontSize: 13,
-            ),
-          ),
+        titleLarge: const TextStyle(
+          color: AppColors.textPrimaryDark,
+          fontWeight: FontWeight.bold,
+          fontSize: 22,
+        ),
+        titleMedium: const TextStyle(
+          color: AppColors.textPrimaryDark,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        bodyLarge: const TextStyle(
+          color: AppColors.textPrimaryDark,
+          fontSize: 15,
+        ),
+        bodyMedium: const TextStyle(
+          color: AppColors.textSecondaryDark,
+          fontSize: 13,
+        ),
+      ),
       cardTheme: CardThemeData(
         color: AppColors.surfaceDark,
         elevation: 0,
