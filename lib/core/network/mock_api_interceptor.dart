@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 
 class MockApiInterceptor extends Interceptor {
@@ -58,7 +59,7 @@ class MockApiInterceptor extends Interceptor {
     final authHeader = options.headers['Authorization'] as String?;
 
     // Simulate Network Latency (short delay in tests to check spinners, normal delay in dev)
-    final isTest = Platform.environment.containsKey('FLUTTER_TEST');
+    final isTest = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
     await Future.delayed(Duration(milliseconds: isTest ? 20 : 600));
 
     // 1. Auth check
@@ -231,7 +232,7 @@ class MockApiInterceptor extends Interceptor {
       });
 
       // Asynchronously update status (only in non-test environments to avoid pending timers)
-      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      if (kIsWeb || !Platform.environment.containsKey('FLUTTER_TEST')) {
         Future.delayed(const Duration(seconds: 3), () {
           if (_messagesDb[tenantId] != null &&
               _messagesDb[tenantId]!.isNotEmpty) {
