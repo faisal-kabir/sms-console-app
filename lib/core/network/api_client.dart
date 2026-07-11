@@ -5,7 +5,6 @@ import '../config/app_config.dart';
 import '../../features/sms/data/repositories/tenant_repository.dart';
 import 'tenant_interceptor.dart';
 import 'auth_refresh_interceptor.dart';
-import 'mock_api_interceptor.dart';
 
 class ApiClient {
   final Dio dio;
@@ -22,18 +21,9 @@ class ApiClient {
       ) {
     dio.interceptors.clear();
 
-    // 1. Add logger interceptor in debug mode
+    // 1. Add custom logger interceptor in debug mode
     if (kDebugMode) {
-      dio.interceptors.add(
-        LogInterceptor(
-          request: true,
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          responseBody: true,
-          error: true,
-        ),
-      );
+      dio.interceptors.add(ApiLogInterceptor());
     }
 
     // 2. Add Tenant Injector Interceptor
@@ -41,9 +31,6 @@ class ApiClient {
 
     // 3. Add Auth Token Refresh Interceptor
     dio.interceptors.add(AuthRefreshInterceptor(tenantRepository, dio));
-
-    // 4. Add Mock API Interceptor for offline stubbing
-    dio.interceptors.add(MockApiInterceptor());
   }
 
   Future<Response<T>> request<T>(
@@ -68,5 +55,43 @@ class ApiClient {
       queryParameters: queryParameters,
       options: options,
     );
+  }
+}
+
+class ApiLogInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    debugPrint('--> ${options.method} ${options.uri}');
+    debugPrint('Headers: ${options.headers}');
+    if (options.data != null) {
+      debugPrint('Body: ${options.data}');
+    }
+    super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    debugPrint('<-- ${response.statusCode} ${response.requestOptions.uri}');
+    debugPrint('Response: ${response.data}');
+    super.onResponse(response, handler);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final isConnectionError = err.type == DioExceptionType.connectionError ||
+        err.error?.toString().contains('SocketException') == true ||
+        err.message?.contains('Failed host lookup') == true;
+
+    if (isConnectionError) {
+      debugPrint(
+        'xxx Connection Offline (Failed host lookup for ${err.requestOptions.uri.host}). Using offline fallback.',
+      );
+    } else {
+      debugPrint('xxx Error: ${err.message}');
+      if (err.response != null) {
+        debugPrint('Response: ${err.response!.data}');
+      }
+    }
+    super.onError(err, handler);
   }
 }

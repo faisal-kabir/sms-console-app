@@ -43,11 +43,6 @@ class SmsMessage extends Equatable {
   @override
   List<Object?> get props => [
     messageId,
-    recipient,
-    status,
-    segmentCount,
-    cost,
-    sentAt,
   ];
 }
 
