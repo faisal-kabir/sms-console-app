@@ -2,12 +2,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:sms_console_app/features/sms/presentation/widgets/sms_console.dart';
-import 'package:sms_console_app/core/theme/app_theme.dart';
-import 'package:sms_console_app/core/network/api_client.dart';
-import 'package:sms_console_app/features/sms/data/repositories/sms_repository.dart';
-import 'package:sms_console_app/features/sms/data/repositories/tenant_repository.dart';
-import 'package:sms_console_app/features/sms/presentation/bloc/sms_console_bloc.dart';
+import 'package:sms_console_app/features/sms/sms_console_page.dart';
+import 'package:sms_console_app/core/app_theme.dart';
+import 'package:sms_console_app/core/api_client.dart';
+import '../mocks/mock_api_interceptor.dart';
+import 'package:sms_console_app/features/sms/sms_repository.dart';
+import 'package:sms_console_app/features/sms/sms_bloc.dart';
 
 // Mock Connectivity to avoid native channel dependency in tests
 class MockConnectivity implements Connectivity {
@@ -35,7 +35,7 @@ void main() {
       () => ApiClient(
         tenantRepository: getIt<TenantRepository>(),
         connectivity: getIt<Connectivity>(),
-      ),
+      )..dio.interceptors.add(MockApiInterceptor()),
     );
     getIt.registerLazySingleton<SmsRepository>(
       () => SmsRepository(apiClient: getIt<ApiClient>()),

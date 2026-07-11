@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sms_console_app/core/domain/money.dart';
+import 'package:sms_console_app/features/sms/sms_models.dart';
 
 void main() {
   group(

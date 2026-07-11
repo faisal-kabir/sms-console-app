@@ -1,16 +1,15 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sms_console_app/core/network/mock_api_interceptor.dart';
-import '../config/app_config.dart';
-import '../../features/sms/data/repositories/tenant_repository.dart';
-import 'tenant_interceptor.dart';
-import 'auth_refresh_interceptor.dart';
+import 'app_config.dart';
+import '../features/sms/sms_repository.dart';
 
 class ApiClient {
   final Dio dio;
   final TenantRepository tenantRepository;
   final Connectivity connectivity;
+
+  bool _isRefreshing = false;
 
   ApiClient({required this.tenantRepository, required this.connectivity})
     : dio = Dio(
@@ -21,18 +20,9 @@ class ApiClient {
         ),
       ) {
     dio.interceptors.clear();
-
-    // 1. Add custom logger interceptor in debug mode
     if (kDebugMode) {
       dio.interceptors.add(ApiLogInterceptor());
     }
-
-    // 2. Add Tenant Injector Interceptor
-    dio.interceptors.add(TenantInterceptor(tenantRepository));
-    dio.interceptors.add(MockApiInterceptor());
-
-    // 3. Add Auth Token Refresh Interceptor
-    dio.interceptors.add(AuthRefreshInterceptor(tenantRepository, dio));
   }
 
   Future<Response<T>> request<T>(
@@ -41,7 +31,7 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    // Check connectivity first
+    // 1. Check internet connection
     final connectivityResult = await connectivity.checkConnectivity();
     if (connectivityResult.contains(ConnectivityResult.none)) {
       throw DioException(
@@ -51,12 +41,60 @@ class ApiClient {
       );
     }
 
-    return dio.request<T>(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-    );
+    final reqOptions = options ?? Options();
+    reqOptions.headers ??= {};
+
+    // 2. Attach Tenant ID and Bearer authorization credentials
+    reqOptions.headers!['X-Tenant-Id'] = tenantRepository.tenantId;
+    reqOptions.headers!['Authorization'] = 'Bearer ${tenantRepository.token}';
+
+    try {
+      return await dio.request<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: reqOptions,
+      );
+    } on DioException catch (err) {
+      final isAuthError = err.response?.statusCode == 401;
+
+      // 3. Auto-refresh auth token on 401 Unauthorized errors
+      if (isAuthError && !_isRefreshing && path != '/api/v1/auth/refresh') {
+        _isRefreshing = true;
+        try {
+          final refreshResponse = await dio.post<Map<String, dynamic>>(
+            '/api/v1/auth/refresh',
+            options: Options(
+              headers: {
+                'X-Tenant-Id': tenantRepository.tenantId,
+                'Authorization': 'Bearer ${tenantRepository.refreshToken}',
+              },
+            ),
+          );
+
+          final newAccessToken = refreshResponse.data?['accessToken'] as String?;
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            tenantRepository.updateToken(newAccessToken);
+
+            // Retry request with the new access token
+            reqOptions.headers!['Authorization'] = 'Bearer $newAccessToken';
+            _isRefreshing = false;
+            return await dio.request<T>(
+              path,
+              data: data,
+              queryParameters: queryParameters,
+              options: reqOptions,
+            );
+          }
+        } catch (_) {
+          _isRefreshing = false;
+          rethrow;
+        } finally {
+          _isRefreshing = false;
+        }
+      }
+      rethrow;
+    }
   }
 }
 

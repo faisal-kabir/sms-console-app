@@ -1,9 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
-import '../core/network/api_client.dart';
-import '../features/sms/data/repositories/sms_repository.dart';
-import '../features/sms/data/repositories/tenant_repository.dart';
-import '../features/sms/presentation/bloc/sms_console_bloc.dart';
+import '../core/api_client.dart';
+import '../features/sms/sms_repository.dart';
+import '../features/sms/sms_bloc.dart';
 
 final getIt = GetIt.instance;
 

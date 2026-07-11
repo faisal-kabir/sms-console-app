@@ -1,11 +1,135 @@
 import 'package:dio/dio.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/domain/money.dart';
-import '../../data/repositories/sms_repository.dart';
-import '../../data/repositories/tenant_repository.dart';
-import 'sms_console_event.dart';
-import 'sms_console_state.dart';
+import 'sms_models.dart';
+import 'sms_repository.dart';
 
+// ==========================================
+// BLoC Status & States
+// ==========================================
+enum SmsConsoleStatus { initial, loading, success, error }
+
+class SmsConsoleState extends Equatable {
+  final SmsConsoleStatus status;
+  final String tenantId;
+  final CostBreakdown? costBreakdown;
+  final List<SmsMessage> messages;
+  final String? nextCursor;
+  final bool isSending;
+  final String? error;
+  final String? successMessage;
+  final bool isRateLimited;
+  final int retryAfterSeconds;
+
+  const SmsConsoleState({
+    required this.status,
+    required this.tenantId,
+    this.costBreakdown,
+    this.messages = const [],
+    this.nextCursor,
+    this.isSending = false,
+    this.error,
+    this.successMessage,
+    this.isRateLimited = false,
+    this.retryAfterSeconds = 0,
+  });
+
+  factory SmsConsoleState.initial(String tenantId) {
+    return SmsConsoleState(
+      status: SmsConsoleStatus.initial,
+      tenantId: tenantId,
+    );
+  }
+
+  SmsConsoleState copyWith({
+    SmsConsoleStatus? status,
+    String? tenantId,
+    CostBreakdown? costBreakdown,
+    List<SmsMessage>? messages,
+    String? nextCursor,
+    bool? isSending,
+    String? error,
+    String? successMessage,
+    bool? isRateLimited,
+    int? retryAfterSeconds,
+  }) {
+    return SmsConsoleState(
+      status: status ?? this.status,
+      tenantId: tenantId ?? this.tenantId,
+      costBreakdown: costBreakdown ?? this.costBreakdown,
+      messages: messages ?? this.messages,
+      nextCursor: nextCursor, // Can be set to null for resetting
+      isSending: isSending ?? this.isSending,
+      error: error, // Can be cleared by passing null
+      successMessage: successMessage, // Can be cleared by passing null
+      isRateLimited: isRateLimited ?? this.isRateLimited,
+      retryAfterSeconds: retryAfterSeconds ?? this.retryAfterSeconds,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    status,
+    tenantId,
+    costBreakdown,
+    messages,
+    nextCursor,
+    isSending,
+    error,
+    successMessage,
+    isRateLimited,
+    retryAfterSeconds,
+  ];
+}
+
+// ==========================================
+// BLoC Events
+// ==========================================
+abstract class SmsConsoleEvent extends Equatable {
+  const SmsConsoleEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class FetchDashboard extends SmsConsoleEvent {
+  const FetchDashboard();
+}
+
+class ChangeTenant extends SmsConsoleEvent {
+  final String newTenantId;
+
+  const ChangeTenant(this.newTenantId);
+
+  @override
+  List<Object?> get props => [newTenantId];
+}
+
+class LoadMoreMessages extends SmsConsoleEvent {
+  const LoadMoreMessages();
+}
+
+class SendSms extends SmsConsoleEvent {
+  final String to;
+  final String body;
+
+  const SendSms({required this.to, required this.body});
+
+  @override
+  List<Object?> get props => [to, body];
+}
+
+class ClearError extends SmsConsoleEvent {
+  const ClearError();
+}
+
+class ClearSuccess extends SmsConsoleEvent {
+  const ClearSuccess();
+}
+
+// ==========================================
+// BLoC Business Logic Engine
+// ==========================================
 class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
   final SmsRepository smsRepository;
   final TenantRepository tenantRepository;
@@ -50,14 +174,13 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
   ) async {
     tenantRepository.setTenantId(event.newTenantId);
 
-    // Clear old state completely for tenant isolation
+    // Hard tenant isolation: flush existing state immediately
     emit(
       SmsConsoleState.initial(
         event.newTenantId,
       ).copyWith(status: SmsConsoleStatus.loading),
     );
 
-    // Trigger fresh dashboard load
     add(const FetchDashboard());
   }
 
@@ -98,10 +221,8 @@ class SmsConsoleBloc extends Bloc<SmsConsoleEvent, SmsConsoleState> {
         body: event.body,
       );
 
-      // Refresh breakdown and message history
       final breakdown = await smsRepository.getCostBreakdown();
       final messagesRes = await smsRepository.getMessages(limit: 50);
-
       final costMoney = Money.parse(sendRes.cost, currency: sendRes.currency);
 
       emit(

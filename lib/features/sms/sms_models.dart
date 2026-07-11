@@ -1,6 +1,78 @@
 import 'package:equatable/equatable.dart';
-import '../../../../core/domain/money.dart';
 
+// ==========================================
+// Exact Decimal Currency Class (No floats)
+// ==========================================
+class Money extends Equatable {
+  final int microAmount; // Scaled by 10,000 (e.g. 1500 micro-units = 0.1500)
+  final String currency;
+
+  const Money(this.microAmount, {this.currency = 'EUR'});
+
+  factory Money.zero({String currency = 'EUR'}) => Money(0, currency: currency);
+
+  factory Money.parse(String amountStr, {String currency = 'EUR'}) {
+    final parts = amountStr.trim().split('.');
+    if (parts.isEmpty) {
+      throw FormatException('Invalid amount format: $amountStr');
+    }
+
+    int whole = int.parse(parts[0]);
+    int fractional = 0;
+
+    if (parts.length > 1) {
+      String fracStr = parts[1];
+      if (fracStr.length > 4) {
+        fracStr = fracStr.substring(0, 4);
+      } else {
+        fracStr = fracStr.padRight(4, '0');
+      }
+      fractional = int.parse(fracStr);
+    }
+
+    final micro = (whole * 10000) + fractional;
+    return Money(micro, currency: currency);
+  }
+
+  factory Money.fromMicro(int micro, {String currency = 'EUR'}) {
+    return Money(micro, currency: currency);
+  }
+
+  Money operator +(Money other) {
+    if (currency != other.currency) {
+      throw ArgumentError(
+        'Cannot add different currencies: $currency and ${other.currency}',
+      );
+    }
+    return Money(microAmount + other.microAmount, currency: currency);
+  }
+
+  Money operator *(int count) {
+    return Money(microAmount * count, currency: currency);
+  }
+
+  double toDouble() => microAmount / 10000.0;
+
+  String format() => toDouble().toStringAsFixed(2);
+
+  String get currencySymbol {
+    if (currency == 'EUR') return '€';
+    if (currency == 'USD') return '\$';
+    return currency;
+  }
+
+  String formatWithSymbol() => '$currencySymbol${format()}';
+
+  @override
+  String toString() => toDouble().toStringAsFixed(4);
+
+  @override
+  List<Object?> get props => [microAmount, currency];
+}
+
+// ==========================================
+// SMS Message & History Feed Models
+// ==========================================
 class SmsMessage extends Equatable {
   final String messageId;
   final String recipient;
@@ -41,11 +113,12 @@ class SmsMessage extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-    messageId,
-  ];
+  List<Object?> get props => [messageId];
 }
 
+// ==========================================
+// Billing & Cost Breakdown Models
+// ==========================================
 class CostBreakdownRow extends Equatable {
   final String provider;
   final Money totalCost;

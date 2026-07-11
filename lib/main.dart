@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'di/injection.dart';
-import 'core/theme/app_theme.dart';
-import 'features/sms/presentation/widgets/sms_console.dart';
+import 'core/app_theme.dart';
+import 'features/sms/sms_console_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
